@@ -1,0 +1,27 @@
+    <main id="content-replacement">
+        <% if (errorMessage) { %>
+            <div class="user-message user-message--error"><%= errorMessage %></div>
+        <% } %>
+        <form class="create-post-form" action="/createPost" method="POST">
+            <div class="form-control">
+                <label for="email">Title</label>
+                <input 
+                    type="text" 
+                    name="title" 
+                    id="title"
+                    required
+                >
+            </div>
+            <div class="form-control">
+                <label for="password">Description</label>
+                <input 
+                    type="text" 
+                    name="description" 
+                    id="description" 
+                    required
+                >
+            </div>
+            <button class="btn" type="submit">Add Post</button>
+        </form>
+    </main>
+<%- include('../includes/end.ejs') %>
