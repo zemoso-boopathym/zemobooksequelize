@@ -4,7 +4,7 @@
   "description": "Implementing shopping cart POC in Node Js with SQL and Typescript features",
   "main": "dist/app.js",
   "scripts": {
-    "start": "nodemon --watch src/ --exec \"npm run compile\" -e ts",
+    "start": "nodemon --watch src/ --ignore src/test --exec \"npm run compile\" -e ts",
     "compile": "tsc && node dist/app/app.js",
     "test:cov": "nyc mocha -r ts-node/register src/test/**/*.test.ts",
     "coverage": "nyc report --reporter=lcov --report-dir='nyc_coverage'",
@@ -35,7 +35,8 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "mysql2": "^2.3.3"
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.21.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

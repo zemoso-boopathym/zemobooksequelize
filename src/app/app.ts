@@ -10,6 +10,9 @@ import postRoutes from "../routes/posts";
 import error404 from "../routes/error404";
 
 import { config } from "../util/config";
+import { sequelize } from "../util/database";
+import { Post } from "../models/posts";
+import { User } from "../models/user";
 
 interface ErrorStatusCode extends Error {
   httpStatusCode: number;
@@ -54,4 +57,11 @@ app.use(
   }
 );
 
-export default app.listen(config.PORT || 3000);
+Post.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
+User.hasMany(Post);
+
+sequelize.sync().then((_result) => {
+  app.listen(config.PORT || 3000);
+});
+
+export default app;

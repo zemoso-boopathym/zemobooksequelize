@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Post from "../models/posts";
+import { Post } from "../models/posts";
 
 export const getPosts = async (
   req: Request,
@@ -7,15 +7,20 @@ export const getPosts = async (
   _next: NextFunction
 ) => {
   try {
-    const postModel: any = new Post(null, null, null, null);
     const username = req.body.email;
+    console.log("username");
+    console.log(username);
     if (!username) {
       throw new Error("Unauthorized!");
     }
-    const result = await postModel.fetchAllByMail(username);
+    const posts = await Post.findAll({
+      where: {
+        userEmail: username,
+      },
+    });
     return res.status(200).json({
-      posts: result[0],
-      length: result[0].length,
+      posts: posts,
+      length: posts.length,
     });
   } catch (err) {
     const error = err as Error;
@@ -44,15 +49,21 @@ export const createPost = async (
   _next: NextFunction
 ) => {
   try {
-    const { title, description } = req.body;
+    const { id, title, description } = req.body;
     const createdAt = new Date();
     const email = req.body.username;
     if (email && title && description) {
-      const postModel: any = new Post(title, description, createdAt, email);
-      const result = await postModel.save();
-      if (result[0].affectedRows === 1) {
-        return res.status(200).json(result[0]);
-      }
+      const newPost = await Post.create({
+        id: id,
+        title: title,
+        description: description,
+        createdAt: createdAt,
+        userEmail: email,
+      });
+      return res.status(200).json({
+        message: "Created New post",
+        newPost: newPost,
+      });
     }
     throw new Error("No data created!");
   } catch (err) {
@@ -72,11 +83,17 @@ export const deletePost = async (
   const { id } = req.body;
 
   try {
-    const postModel: any = new Post(null, null, null, null);
-    const result = await postModel.deleteByID(id);
+    const deletedPost: any = await Post.destroy({
+      where: {
+        id: id,
+      },
+    });
 
-    if (result[0].affectedRows === 1) {
-      return res.status(200).json(result[0]);
+    if (deletedPost === 1) {
+      return res.status(200).json({
+        deletedPostCount: 1,
+        id: id,
+      });
     }
 
     throw new Error("Data not found!");
@@ -92,20 +109,20 @@ export const getAllPosts = async (
   res: Response,
   _next: NextFunction
 ) => {
-  const postModel: any = new Post(null, null, null, null);
   const username = req.body.username;
   try {
     if (username !== "admin@admin.com") {
       throw new Error("Unauthorized!");
     } else {
-      const result = await postModel.adminFetchAll();
+      const posts = await Post.findAll({});
       return res.status(200).json({
-        posts: result[0],
+        posts: posts,
+        length: posts.length,
       });
     }
   } catch (err) {
     res.status(401).json({
-      error: err,
+      error: "Unauthorized",
     });
   }
 };

@@ -31,6 +31,7 @@ describe("Posts API", () => {
       chai
         .request(app)
         .get("/post/getPosts")
+        .send({ email: "" })
         .auth(config.USER_TOKEN!, { type: "bearer" })
         .end((_, response) => {
           response.should.have.status(401);

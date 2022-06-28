@@ -7,11 +7,7 @@ interface JwtPayload {
   username: string;
 }
 
-const isAuthenticated = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const isAuth = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.get("Authorization");
   if (!authHeader) {
     return res.status(404).render("404", {
@@ -27,7 +23,7 @@ const isAuthenticated = async (
         config.JWT_KEY!
       ) as unknown as JwtPayload;
       req.body.username = username;
-      res.locals.isAuthenticated = req.body.username;
+      res.locals.isAuthenticated = username;
       next();
     } else {
       return res.status(401).json({
@@ -42,4 +38,4 @@ const isAuthenticated = async (
   }
 };
 
-export default isAuthenticated;
+export default isAuth;

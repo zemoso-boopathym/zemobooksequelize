@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 export const landingPage = (
-  req: Request,
+  _req: Request,
   res: Response,
   _next: NextFunction
 ) => {
@@ -9,6 +9,5 @@ export const landingPage = (
     path: "/posts/welcome",
     pageTitle: "Welcome",
     token: null,
-    isAuthenticated: req.body.username,
   });
 };

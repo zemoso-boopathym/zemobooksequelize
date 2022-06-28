@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import bcryptjs from "bcryptjs";
 import signJWT from "../util/signJWT";
-import User from "../models/user";
+import { User } from "../models/user";
+import { config } from "../util/config";
 
 interface ErrorWithStatusCode extends Error {
   httpStatusCode?: number;
@@ -12,15 +13,8 @@ export const loginPage = (
   res: Response,
   _next: NextFunction
 ) => {
-  res.status(200).render("auth/login", {
-    path: "/login",
-    pageTitle: "Login",
-    errorMessage: "",
-    oldInput: {
-      email: "",
-      password: "",
-    },
-    validationErrors: [],
+  res.status(200).json({
+    message: "Login Page",
   });
 };
 
@@ -29,38 +23,27 @@ export const signupPage = (
   res: Response,
   _next: NextFunction
 ) => {
-  res.render("auth/signup", {
-    path: "/signup",
-    pageTitle: "Signup",
-    errorMessage: "",
-    oldInput: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-    validationErrors: [],
+  res.status(200).json({
+    message: "Signup page",
   });
 };
 
-const register = async (req: Request, res: Response, _next: NextFunction) => {
+export const register = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
   try {
     const { email, password } = req.body;
     if (email && password) {
       const hashPassword = await bcryptjs.hash(password, 10);
-      const userModel: any = new User(email, hashPassword);
-      const result = await userModel.save();
-      if (result[0].affectedRows === 1) {
-        return res.status(201).render("auth/login", {
-          path: "/login",
-          pageTitle: "Login",
-          errorMessage: "",
-          oldInput: {
-            email: "",
-            password: "",
-          },
-          validationErrors: [],
-        });
-      }
+      const user: any = await User.create({
+        email,
+        password: hashPassword,
+      });
+      return res.status(201).json({
+        createdUser: user,
+      });
     }
     throw new Error("Server Error!");
   } catch (err) {
@@ -72,19 +55,25 @@ const register = async (req: Request, res: Response, _next: NextFunction) => {
   }
 };
 
-const postLogin = async (req: Request, res: Response, _next: NextFunction) => {
+export const postLogin = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
   const { email, password } = req.body;
 
   try {
-    const userModel: any = new User(email, password);
-    const userData = await userModel.findByMail(email);
-    const result = await bcryptjs.compare(password, userData[0][0].password);
+    const userData: any = await User.findByPk(email);
+    const result = await bcryptjs.compare(password, userData.password);
     if (result) {
-      const token = signJWT(userData[0][0]);
+      const token = signJWT({
+        email: userData.email,
+        password: userData.password,
+      });
       if (token) {
         return res.status(200).json({
           token: token,
-          username: userData[0][0].email,
+          username: userData.email,
         });
       }
     }
@@ -97,31 +86,27 @@ const postLogin = async (req: Request, res: Response, _next: NextFunction) => {
   }
 };
 
-const logoutUser = async (req: Request, res: Response, _next: NextFunction) => {
-  req.body.username = null;
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
+  req.body.username = "";
   res.locals.isAuthenticated = false;
-  res.status(200).render("auth/login", {
-    path: "/auth/login",
-    pageTitle: "Login",
-    errorMessage: "",
-    oldInput: {
-      email: "",
-      password: "",
-    },
-    validationErrors: [],
+  res.status(200).json({
+    message: "Logout",
   });
 };
 
-const getAllUsers = async (
+export const getAllUsers = async (
   _req: Request,
   res: Response,
   _next: NextFunction
 ) => {
-  const userModel: any = new User(null, null);
-  const userData = await userModel.fetchAll();
+  const userData: any = await User.findAll({});
   res.status(200).json({
-    users: userData[0],
-    count: userData[0].length,
+    users: userData,
+    length: userData.length,
   });
 };
 
@@ -132,12 +117,19 @@ export const deleteUser = async (
 ) => {
   const { email } = req.body;
   try {
-    const userModel: any = new User(null, null);
-    const result = await userModel.deleteByMail(email);
-    if (result[0].affectedRows === 1) {
-      return res.status(200).json(result[0]);
+    if (email !== config.ADMIN_USER) {
+      const deletedUser = await User.destroy({
+        where: {
+          email,
+        },
+      });
+      if (deletedUser === 1) {
+        return res.status(200).json({
+          deletedPostCount: 1,
+          email: email,
+        });
+      }
     }
-
     const error: ErrorWithStatusCode = new Error("Data not found!");
     error.httpStatusCode = 500;
     return next(error);
@@ -147,5 +139,3 @@ export const deleteUser = async (
     });
   }
 };
-
-export { postLogin, register, logoutUser, getAllUsers };
