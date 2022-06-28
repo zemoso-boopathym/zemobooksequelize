@@ -1,0 +1,27 @@
+.post__item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 40rem;
+  max-width: 90%;
+}
+
+.post__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  margin-bottom: 1rem;
+  flex-direction: column;
+}
+
+.post__item h1,
+.post__item h2 {
+  margin: 0 1rem 0 0;
+  font-size: 1.5rem;
+}
+
+.post__item h2 {
+  font-size: 1.2rem;
+}

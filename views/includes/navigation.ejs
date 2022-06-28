@@ -1,0 +1,32 @@
+<div class="backdrop"></div>
+<header class="main-header">
+    <nav class="main-header__nav">
+        <ul class="main-header__item-list">
+            <li class="main-header__item">
+                <a class="welcome-nav <%= path === '/' ? 'active' : '' %>" href="/">ZB</a>
+            </li>
+            <li class="main-header__item">
+                <a name="getPosts" class="posts <%= path === '/post/getPosts' ? 'active' : '' %>" >Posts</a>
+            </li>
+            <li class="main-header__item">
+                <a name="getAllPosts" class="posts <%= path === '/post/getAllPosts' ? 'active' : ''%>">All Posts</a>
+            </li>
+            <li class="main-header__item">
+                <a name="createPost" class="posts <%= path === '/post/createPost' ? 'active' : '' %>" >Create Post</a>
+            </li>
+        </ul>
+        <ul class="main-header__item-list">
+                <li class="main-header__item">
+                    <a class="<%= path === '/login' ? 'active' : '' %>" href="/login">Login</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup">Signup</a>
+                </li>
+                <li class="main-header__item">
+                    <form action="/logout" method="POST">
+                        <button type="submit" id="logout-btn">Logout</button>
+                    </form>
+                </li>
+        </ul>
+    </nav>
+</header>

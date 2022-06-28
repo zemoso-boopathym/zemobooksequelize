@@ -1,0 +1,20 @@
+        <main id="content-replacement">
+            <% if (posts.length > 0) { %>
+                <ul class="post__item-list">
+                    <% posts.forEach(p => { %>
+                        <li class="post__item">
+                            <h1><%= p.title %></h1>
+                            <h2>Description: <%= p.description %></h2>
+                            <p>Created At: <%= p.createdAt %></p>
+                            <i>Author: <%= p.email %></i>
+                        </li>
+                    <% }) %>
+                </ul>
+                <hr>
+                
+            <% } else { %>
+                <h1>No Posts to show!</h1>
+                <h2>Start creating posts!</h2>
+            <% } %>
+        </main>
+        <%- include('../includes/end.ejs') %>
